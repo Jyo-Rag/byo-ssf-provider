@@ -8,11 +8,14 @@ interface ConfigPanelProps {
 }
 
 export default function ConfigPanel({ oktaOrgUrl, onOktaOrgUrlChange }: ConfigPanelProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(!oktaOrgUrl);
   const [localUrl, setLocalUrl] = useState(oktaOrgUrl);
 
   useEffect(() => {
     setLocalUrl(oktaOrgUrl);
+    if (!oktaOrgUrl) {
+      setIsExpanded(true);
+    }
   }, [oktaOrgUrl]);
 
   const handleSave = () => {
