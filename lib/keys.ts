@@ -34,8 +34,11 @@ export async function getJWKS(): Promise<JWKS> {
     throw new Error('SSF_PUBLIC_KEY environment variable is not set');
   }
 
-  // Handle escaped newlines
-  const formattedKey = publicKeyPem.replace(/\\n/g, '\n');
+  // Handle both escaped newlines (\n as literal string) and actual newlines
+  let formattedKey = publicKeyPem.replace(/\\n/g, '\n');
+
+  // Also handle case where quotes were included
+  formattedKey = formattedKey.replace(/^["']|["']$/g, '');
 
   // Import the public key using the crypto module
   const { createPublicKey } = await import('crypto');

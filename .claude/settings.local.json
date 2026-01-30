@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:help.okta.com)",
+      "WebFetch(domain:developer.okta.com)",
+      "WebFetch(domain:itpdemo01.atkoepd.com)",
+      "Bash(npm create:*)",
+      "Bash(npm install:*)",
+      "Bash(node scripts/generate-keys.mjs:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run dev:*)",
+      "Bash(curl:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(gh repo create:*)",
+      "Bash(winget install:*)",
+      "Bash(git push)"
+    ]
+  }
+}

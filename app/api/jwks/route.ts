@@ -14,8 +14,15 @@ export async function GET() {
   } catch (error) {
     console.error('Error generating JWKS:', error);
 
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+
     return NextResponse.json(
-      { error: 'Failed to generate JWKS. Check server configuration.' },
+      {
+        error: 'Failed to generate JWKS. Check server configuration.',
+        details: errorMessage,
+        hasPublicKey: !!process.env.SSF_PUBLIC_KEY,
+        hasKeyId: !!process.env.SSF_KEY_ID,
+      },
       { status: 500 }
     );
   }
