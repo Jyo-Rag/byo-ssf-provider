@@ -2,7 +2,8 @@ import { SignJWT } from 'jose';
 import { getPrivateKey, getKeyId } from './keys';
 import type { RiskEventFormData, SecurityEventToken, SubjectIdentifier } from './types';
 
-const CAEP_ASSURANCE_LEVEL_CHANGE = 'https://schemas.openid.net/secevent/caep/event-type/assurance-level-change';
+// Okta-specific event type for user risk changes
+const OKTA_USER_RISK_CHANGE = 'https://schemas.okta.com/secevent/okta/event-type/user-risk-change';
 
 // Determine change direction based on risk levels
 function getChangeDirection(previous: string, current: string): 'increase' | 'decrease' {
@@ -18,18 +19,22 @@ function generateEventId(): string {
   return `evt_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
 }
 
-// Build the subject identifier based on format
-function buildSubject(identifier: string, format: 'email' | 'opaque'): SubjectIdentifier {
+// Build the subject identifier based on format (Okta expects a 'user' wrapper)
+function buildSubject(identifier: string, format: 'email' | 'opaque'): { user: SubjectIdentifier } {
   if (format === 'email') {
     return {
-      format: 'email',
-      email: identifier,
+      user: {
+        format: 'email',
+        email: identifier,
+      },
     };
   }
 
   return {
-    format: 'opaque',
-    id: identifier,
+    user: {
+      format: 'opaque',
+      id: identifier,
+    },
   };
 }
 
@@ -56,7 +61,7 @@ export function getIssuer(): string {
 export async function createSecurityEventToken(
   eventData: RiskEventFormData,
   audience: string
-): Promise<{ token: string; eventId: string }> {
+): Promise<{ token: string; eventId: string; decodedPayload: SecurityEventToken }> {
   const privateKey = await getPrivateKey();
   const keyId = getKeyId();
   const issuer = getIssuer();
@@ -66,10 +71,10 @@ export async function createSecurityEventToken(
   const subject = buildSubject(eventData.userIdentifier, eventData.identifierType);
   const changeDirection = getChangeDirection(eventData.previousLevel, eventData.currentLevel);
 
-  // Build the SET payload
-  const payload: Omit<SecurityEventToken, 'iss' | 'aud' | 'iat' | 'jti'> = {
+  // Build the SET payload using Okta's expected format
+  const eventPayload = {
     events: {
-      [CAEP_ASSURANCE_LEVEL_CHANGE]: {
+      [OKTA_USER_RISK_CHANGE]: {
         subject,
         current_level: eventData.currentLevel,
         previous_level: eventData.previousLevel,
@@ -85,7 +90,7 @@ export async function createSecurityEventToken(
   };
 
   // Sign the JWT
-  const token = await new SignJWT(payload as unknown as Record<string, unknown>)
+  const token = await new SignJWT(eventPayload as unknown as Record<string, unknown>)
     .setProtectedHeader({ alg: 'RS256', kid: keyId, typ: 'secevent+jwt' })
     .setIssuer(issuer)
     .setAudience(audience)
@@ -93,5 +98,14 @@ export async function createSecurityEventToken(
     .setJti(eventId)
     .sign(privateKey);
 
-  return { token, eventId };
+  // Build the full decoded payload for display
+  const decodedPayload: SecurityEventToken = {
+    iss: issuer,
+    aud: audience,
+    iat: now,
+    jti: eventId,
+    ...eventPayload,
+  };
+
+  return { token, eventId, decodedPayload };
 }

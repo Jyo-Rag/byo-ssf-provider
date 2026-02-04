@@ -11,9 +11,11 @@ export interface SubjectIdentifier {
   id?: string;
 }
 
-// CAEP Assurance Level Change event payload
-export interface AssuranceLevelChangeEvent {
-  subject: SubjectIdentifier;
+// Okta User Risk Change event payload
+export interface UserRiskChangeEvent {
+  subject: {
+    user: SubjectIdentifier;
+  };
   current_level: RiskLevel;
   previous_level: RiskLevel;
   change_direction: 'increase' | 'decrease';
@@ -30,7 +32,7 @@ export interface SecurityEventToken {
   iat: number;
   jti: string;
   events: {
-    [eventType: string]: AssuranceLevelChangeEvent;
+    [eventType: string]: UserRiskChangeEvent;
   };
 }
 
@@ -55,6 +57,10 @@ export interface TransmitResponse {
   message: string;
   eventId?: string;
   error?: string;
+  token?: string;
+  decodedPayload?: SecurityEventToken;
+  oktaResponse?: string;
+  oktaStatus?: number;
 }
 
 // Event history item
@@ -66,6 +72,10 @@ export interface EventHistoryItem {
   previousLevel: RiskLevel;
   success: boolean;
   error?: string;
+  token?: string;
+  decodedPayload?: SecurityEventToken;
+  oktaResponse?: string;
+  oktaStatus?: number;
 }
 
 // JWKS structure

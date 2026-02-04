@@ -139,6 +139,17 @@ export default function EventHistory({ events, onClear }: EventHistoryProps) {
                     {JSON.stringify(event.decodedPayload, null, 2)}
                   </pre>
 
+                  {event.oktaResponse !== undefined && (
+                    <div className="mt-3">
+                      <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                        Okta Response (HTTP {event.oktaStatus})
+                      </span>
+                      <pre className="mt-2 p-3 bg-blue-900 text-blue-200 rounded-md text-xs overflow-x-auto">
+                        {event.oktaResponse || '(empty response)'}
+                      </pre>
+                    </div>
+                  )}
+
                   {event.token && (
                     <div className="mt-3">
                       <div className="flex items-center justify-between mb-2">

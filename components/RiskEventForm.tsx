@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import type { RiskEventFormData, RiskLevel, SubjectFormat, TransmitResponse, EventHistoryItem } from '@/lib/types';
+import type { RiskEventFormData, RiskLevel, SubjectFormat, TransmitResponse, EventHistoryItem, SecurityEventToken } from '@/lib/types';
 
 interface RiskEventFormProps {
   oktaOrgUrl: string;
@@ -23,6 +23,9 @@ export default function RiskEventForm({ oktaOrgUrl, onEventSent }: RiskEventForm
   const [reason, setReason] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lastToken, setLastToken] = useState<string | null>(null);
+  const [lastDecodedPayload, setLastDecodedPayload] = useState<SecurityEventToken | null>(null);
+  const [showToken, setShowToken] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,11 +78,19 @@ export default function RiskEventForm({ oktaOrgUrl, onEventSent }: RiskEventForm
         previousLevel: formData.previousLevel,
         success: result.success,
         error: result.error,
+        token: result.token,
+        decodedPayload: result.decodedPayload,
+        oktaResponse: result.oktaResponse,
+        oktaStatus: result.oktaStatus,
       };
 
       onEventSent(historyItem);
 
       if (result.success) {
+        // Store the token for display
+        setLastToken(result.token || null);
+        setLastDecodedPayload(result.decodedPayload || null);
+        setShowToken(true);
         // Clear form on success
         setUserIdentifier('');
         setReason('');
@@ -237,6 +248,70 @@ export default function RiskEventForm({ oktaOrgUrl, onEventSent }: RiskEventForm
             </>
           )}
         </button>
+
+        {/* SET Token Display */}
+        {lastToken && (
+          <div className="mt-4 border border-gray-200 rounded-md overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setShowToken(!showToken)}
+              className="w-full px-4 py-3 bg-gray-50 text-left flex items-center justify-between hover:bg-gray-100 transition-colors"
+            >
+              <span className="text-sm font-medium text-gray-700">
+                Last Sent SET Token
+              </span>
+              <svg
+                className={`w-5 h-5 text-gray-500 transition-transform ${showToken ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {showToken && (
+              <div className="p-4 space-y-4 bg-white">
+                {/* Decoded Payload */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                      Decoded Payload (JSON)
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => navigator.clipboard.writeText(JSON.stringify(lastDecodedPayload, null, 2))}
+                      className="text-xs text-blue-600 hover:text-blue-800"
+                    >
+                      Copy
+                    </button>
+                  </div>
+                  <pre className="p-3 bg-gray-900 text-green-400 rounded-md text-xs overflow-x-auto max-h-64 overflow-y-auto">
+                    {JSON.stringify(lastDecodedPayload, null, 2)}
+                  </pre>
+                </div>
+
+                {/* Raw JWT */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                      Signed JWT (sent to Okta)
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => navigator.clipboard.writeText(lastToken)}
+                      className="text-xs text-blue-600 hover:text-blue-800"
+                    >
+                      Copy
+                    </button>
+                  </div>
+                  <pre className="p-3 bg-gray-900 text-amber-400 rounded-md text-xs overflow-x-auto max-h-32 overflow-y-auto break-all whitespace-pre-wrap">
+                    {lastToken}
+                  </pre>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </form>
   );

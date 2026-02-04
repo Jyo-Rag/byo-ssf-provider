@@ -62,7 +62,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<TransmitR
     }
 
     // Create the Security Event Token
-    const { token, eventId } = await createSecurityEventToken(event, body.oktaOrgUrl);
+    const { token, eventId, decodedPayload } = await createSecurityEventToken(event, body.oktaOrgUrl);
 
     // Send to Okta SSF endpoint
     const oktaEndpoint = `${body.oktaOrgUrl}/security/api/v1/security-events`;
@@ -76,16 +76,20 @@ export async function POST(request: NextRequest): Promise<NextResponse<TransmitR
       body: token,
     });
 
+    const responseText = await response.text();
+    console.log('Okta SSF response:', response.status, responseText);
+
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Okta SSF error:', response.status, errorText);
+      console.error('Okta SSF error:', response.status, responseText);
 
       return NextResponse.json(
         {
           success: false,
           message: 'Failed to send event to Okta',
-          error: `Okta returned ${response.status}: ${errorText}`,
+          error: `Okta returned ${response.status}: ${responseText}`,
           eventId,
+          token,
+          decodedPayload,
         },
         { status: 502 }
       );
@@ -95,6 +99,10 @@ export async function POST(request: NextRequest): Promise<NextResponse<TransmitR
       success: true,
       message: 'Security event sent successfully',
       eventId,
+      token,
+      decodedPayload,
+      oktaResponse: responseText || '(empty response)',
+      oktaStatus: response.status,
     });
   } catch (error) {
     console.error('Transmit error:', error);
