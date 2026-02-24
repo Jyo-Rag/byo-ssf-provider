@@ -99,3 +99,30 @@ export interface SSFConfiguration {
   delivery_methods_supported: string[];
   critical_subject_members: string[];
 }
+
+// Generate Keys API
+export interface GenerateKeysResponse {
+  success: boolean;
+  message: string;
+  keyId?: string | null;
+  hasKeys?: boolean;
+  error?: string;
+}
+
+// Okta Security Events Provider (SSF Receiver API)
+export interface CreateProviderRequest {
+  oktaOrgUrl: string;
+  apiKey: string;
+  providerName: string;
+  appUrl: string;
+}
+
+export interface CreateProviderResponse {
+  success: boolean;
+  message: string;
+  providerId?: string;
+  providerStatus?: string;
+  error?: string;
+  oktaResponse?: Record<string, unknown>;
+  alreadyExisted?: boolean;
+}

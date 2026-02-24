@@ -9,7 +9,7 @@ interface RiskEventFormProps {
 }
 
 const RISK_LEVELS: { value: RiskLevel; label: string; color: string }[] = [
-  { value: 'low', label: 'Low', color: 'bg-green-100 text-green-800' },
+  { value: 'low', label: 'Low', color: 'bg-emerald-100 text-emerald-800' },
   { value: 'medium', label: 'Medium', color: 'bg-yellow-100 text-yellow-800' },
   { value: 'high', label: 'High', color: 'bg-orange-100 text-orange-800' },
   { value: 'critical', label: 'Critical', color: 'bg-red-100 text-red-800' },
@@ -87,11 +87,9 @@ export default function RiskEventForm({ oktaOrgUrl, onEventSent }: RiskEventForm
       onEventSent(historyItem);
 
       if (result.success) {
-        // Store the token for display
         setLastToken(result.token || null);
         setLastDecodedPayload(result.decodedPayload || null);
         setShowToken(true);
-        // Clear form on success
         setUserIdentifier('');
         setReason('');
       } else {
@@ -116,8 +114,8 @@ export default function RiskEventForm({ oktaOrgUrl, onEventSent }: RiskEventForm
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">Send Risk Event</h2>
+    <form onSubmit={handleSubmit} className="bg-white rounded-lg border border-okta-border shadow-sm p-5">
+      <h2 className="text-base font-semibold text-okta-charcoal mb-4">Send Risk Event</h2>
 
       {error && (
         <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
@@ -128,7 +126,7 @@ export default function RiskEventForm({ oktaOrgUrl, onEventSent }: RiskEventForm
       <div className="space-y-4">
         {/* User Identifier */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-okta-charcoal mb-1.5">
             User Identifier
           </label>
           <div className="flex gap-2">
@@ -137,13 +135,13 @@ export default function RiskEventForm({ oktaOrgUrl, onEventSent }: RiskEventForm
               value={userIdentifier}
               onChange={(e) => setUserIdentifier(e.target.value)}
               placeholder={identifierType === 'email' ? 'user@example.com' : 'User ID'}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="flex-1 px-3 py-2 border border-okta-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-okta-blue focus:border-okta-blue transition-colors"
               required
             />
             <select
               value={identifierType}
               onChange={(e) => setIdentifierType(e.target.value as SubjectFormat)}
-              className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+              className="px-3 py-2 border border-okta-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-okta-blue focus:border-okta-blue bg-white transition-colors"
             >
               <option value="email">Email</option>
               <option value="opaque">Okta User ID</option>
@@ -154,13 +152,13 @@ export default function RiskEventForm({ oktaOrgUrl, onEventSent }: RiskEventForm
         {/* Risk Levels */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-okta-charcoal mb-1.5">
               Previous Level
             </label>
             <select
               value={previousLevel}
               onChange={(e) => setPreviousLevel(e.target.value as RiskLevel)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+              className="w-full px-3 py-2 border border-okta-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-okta-blue focus:border-okta-blue bg-white transition-colors"
             >
               {RISK_LEVELS.map((level) => (
                 <option key={level.value} value={level.value}>
@@ -170,13 +168,13 @@ export default function RiskEventForm({ oktaOrgUrl, onEventSent }: RiskEventForm
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-okta-charcoal mb-1.5">
               Current Level
             </label>
             <select
               value={currentLevel}
               onChange={(e) => setCurrentLevel(e.target.value as RiskLevel)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+              className="w-full px-3 py-2 border border-okta-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-okta-blue focus:border-okta-blue bg-white transition-colors"
             >
               {RISK_LEVELS.map((level) => (
                 <option key={level.value} value={level.value}>
@@ -188,21 +186,21 @@ export default function RiskEventForm({ oktaOrgUrl, onEventSent }: RiskEventForm
         </div>
 
         {/* Visual indicator of change */}
-        <div className="flex items-center justify-center gap-2 py-2">
+        <div className="flex items-center justify-center gap-2 py-1.5">
           <span className={`px-2 py-1 rounded text-xs font-medium ${RISK_LEVELS.find(l => l.value === previousLevel)?.color}`}>
             {previousLevel.toUpperCase()}
           </span>
-          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 text-okta-gray-mid" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
           </svg>
           <span className={`px-2 py-1 rounded text-xs font-medium ${RISK_LEVELS.find(l => l.value === currentLevel)?.color}`}>
             {currentLevel.toUpperCase()}
           </span>
           {currentLevel !== previousLevel && (
-            <span className={`ml-2 text-xs ${
+            <span className={`ml-1 text-xs font-medium ${
               RISK_LEVELS.findIndex(l => l.value === currentLevel) > RISK_LEVELS.findIndex(l => l.value === previousLevel)
                 ? 'text-red-600'
-                : 'text-green-600'
+                : 'text-emerald-600'
             }`}>
               ({RISK_LEVELS.findIndex(l => l.value === currentLevel) > RISK_LEVELS.findIndex(l => l.value === previousLevel)
                 ? 'Increase'
@@ -213,15 +211,15 @@ export default function RiskEventForm({ oktaOrgUrl, onEventSent }: RiskEventForm
 
         {/* Reason */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Reason (optional)
+          <label className="block text-sm font-medium text-okta-charcoal mb-1.5">
+            Reason <span className="font-normal text-okta-gray-mid">(optional)</span>
           </label>
           <textarea
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             placeholder="Describe why the risk level changed..."
             rows={2}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+            className="w-full px-3 py-2 border border-okta-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-okta-blue focus:border-okta-blue resize-none transition-colors"
           />
         </div>
 
@@ -229,11 +227,11 @@ export default function RiskEventForm({ oktaOrgUrl, onEventSent }: RiskEventForm
         <button
           type="submit"
           disabled={isSubmitting || !oktaOrgUrl}
-          className="w-full py-3 px-4 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+          className="w-full py-2.5 px-4 bg-okta-blue text-white font-semibold text-sm rounded-md hover:bg-okta-blue-hover disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
         >
           {isSubmitting ? (
             <>
-              <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+              <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
               </svg>
@@ -241,7 +239,7 @@ export default function RiskEventForm({ oktaOrgUrl, onEventSent }: RiskEventForm
             </>
           ) : (
             <>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
               </svg>
               Send Risk Event
@@ -251,17 +249,18 @@ export default function RiskEventForm({ oktaOrgUrl, onEventSent }: RiskEventForm
 
         {/* SET Token Display */}
         {lastToken && (
-          <div className="mt-4 border border-gray-200 rounded-md overflow-hidden">
+          <div className="mt-2 border border-okta-border rounded-md overflow-hidden">
             <button
               type="button"
               onClick={() => setShowToken(!showToken)}
-              className="w-full px-4 py-3 bg-gray-50 text-left flex items-center justify-between hover:bg-gray-100 transition-colors"
+              className="w-full px-4 py-3 bg-okta-bg text-left flex items-center justify-between hover:bg-gray-100 transition-colors"
             >
-              <span className="text-sm font-medium text-gray-700">
+              <span className="text-sm font-medium text-okta-charcoal">
                 Last Sent SET Token
               </span>
               <svg
-                className={`w-5 h-5 text-gray-500 transition-transform ${showToken ? 'rotate-180' : ''}`}
+                className={`text-okta-gray-mid transition-transform ${showToken ? 'rotate-180' : ''}`}
+                style={{ width: '1rem', height: '1rem' }}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -274,13 +273,13 @@ export default function RiskEventForm({ oktaOrgUrl, onEventSent }: RiskEventForm
                 {/* Decoded Payload */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    <span className="text-xs font-semibold text-okta-gray-mid uppercase tracking-wide">
                       Decoded Payload (JSON)
                     </span>
                     <button
                       type="button"
                       onClick={() => navigator.clipboard.writeText(JSON.stringify(lastDecodedPayload, null, 2))}
-                      className="text-xs text-blue-600 hover:text-blue-800"
+                      className="text-xs text-okta-blue hover:text-okta-blue-hover font-medium"
                     >
                       Copy
                     </button>
@@ -293,13 +292,13 @@ export default function RiskEventForm({ oktaOrgUrl, onEventSent }: RiskEventForm
                 {/* Raw JWT */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    <span className="text-xs font-semibold text-okta-gray-mid uppercase tracking-wide">
                       Signed JWT (sent to Okta)
                     </span>
                     <button
                       type="button"
                       onClick={() => navigator.clipboard.writeText(lastToken)}
-                      className="text-xs text-blue-600 hover:text-blue-800"
+                      className="text-xs text-okta-blue hover:text-okta-blue-hover font-medium"
                     >
                       Copy
                     </button>

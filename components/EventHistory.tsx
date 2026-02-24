@@ -9,7 +9,7 @@ interface EventHistoryProps {
 }
 
 const RISK_LEVEL_COLORS: Record<string, string> = {
-  low: 'bg-green-100 text-green-800',
+  low: 'bg-emerald-100 text-emerald-800',
   medium: 'bg-yellow-100 text-yellow-800',
   high: 'bg-orange-100 text-orange-800',
   critical: 'bg-red-100 text-red-800',
@@ -24,9 +24,9 @@ export default function EventHistory({ events, onClear }: EventHistoryProps) {
 
   if (events.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Event History</h2>
-        <p className="text-gray-500 text-center py-8">
+      <div className="bg-white rounded-lg border border-okta-border shadow-sm p-5">
+        <h2 className="text-base font-semibold text-okta-charcoal mb-4">Event History</h2>
+        <p className="text-okta-gray-mid text-sm text-center py-8">
           No events sent yet. Use the form above to send a risk event.
         </p>
       </div>
@@ -34,18 +34,18 @@ export default function EventHistory({ events, onClear }: EventHistoryProps) {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <div className="bg-white rounded-lg border border-okta-border shadow-sm p-5">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-gray-900">Event History</h2>
+        <h2 className="text-base font-semibold text-okta-charcoal">Event History</h2>
         <button
           onClick={onClear}
-          className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+          className="text-sm text-okta-gray-mid hover:text-okta-charcoal transition-colors font-medium"
         >
           Clear History
         </button>
       </div>
 
-      <div className="space-y-3 max-h-[600px] overflow-y-auto">
+      <div className="space-y-2 max-h-[600px] overflow-y-auto">
         {events.map((event) => {
           const isExpanded = expandedId === event.id;
           return (
@@ -53,7 +53,7 @@ export default function EventHistory({ events, onClear }: EventHistoryProps) {
               key={event.id}
               className={`rounded-md border ${
                 event.success
-                  ? 'bg-green-50 border-green-200'
+                  ? 'bg-emerald-50 border-emerald-200'
                   : 'bg-red-50 border-red-200'
               }`}
             >
@@ -66,7 +66,7 @@ export default function EventHistory({ events, onClear }: EventHistoryProps) {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       {event.success ? (
-                        <svg className="w-4 h-4 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
                       ) : (
@@ -74,7 +74,7 @@ export default function EventHistory({ events, onClear }: EventHistoryProps) {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                       )}
-                      <span className="font-medium text-gray-900 truncate">
+                      <span className="font-medium text-okta-charcoal text-sm truncate">
                         {event.userIdentifier}
                       </span>
                     </div>
@@ -83,7 +83,7 @@ export default function EventHistory({ events, onClear }: EventHistoryProps) {
                       <span className={`px-1.5 py-0.5 rounded text-xs font-medium ${RISK_LEVEL_COLORS[event.previousLevel]}`}>
                         {event.previousLevel}
                       </span>
-                      <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-3 h-3 text-okta-gray-mid" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                       </svg>
                       <span className={`px-1.5 py-0.5 rounded text-xs font-medium ${RISK_LEVEL_COLORS[event.currentLevel]}`}>
@@ -99,11 +99,12 @@ export default function EventHistory({ events, onClear }: EventHistoryProps) {
                   </div>
 
                   <div className="flex items-center gap-2 flex-shrink-0 ml-2">
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-okta-gray-mid">
                       {formatTime(event.timestamp)}
                     </span>
                     <svg
-                      className={`w-4 h-4 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                      className={`text-okta-gray-mid transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                      style={{ width: '1rem', height: '1rem' }}
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -113,7 +114,7 @@ export default function EventHistory({ events, onClear }: EventHistoryProps) {
                   </div>
                 </div>
 
-                <div className="mt-1 text-xs text-gray-500 font-mono truncate" title={event.id}>
+                <div className="mt-1 text-xs text-okta-gray-mid font-mono truncate" title={event.id}>
                   {event.id}
                 </div>
               </button>
@@ -121,7 +122,7 @@ export default function EventHistory({ events, onClear }: EventHistoryProps) {
               {isExpanded && event.decodedPayload && (
                 <div className="px-3 pb-3 border-t border-gray-200 mt-2 pt-3">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    <span className="text-xs font-semibold text-okta-gray-mid uppercase tracking-wide">
                       Decoded JWT Payload
                     </span>
                     <button
@@ -130,7 +131,7 @@ export default function EventHistory({ events, onClear }: EventHistoryProps) {
                         e.stopPropagation();
                         navigator.clipboard.writeText(JSON.stringify(event.decodedPayload, null, 2));
                       }}
-                      className="text-xs text-blue-600 hover:text-blue-800"
+                      className="text-xs text-okta-blue hover:text-okta-blue-hover font-medium"
                     >
                       Copy
                     </button>
@@ -141,10 +142,10 @@ export default function EventHistory({ events, onClear }: EventHistoryProps) {
 
                   {event.oktaResponse !== undefined && (
                     <div className="mt-3">
-                      <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                      <span className="text-xs font-semibold text-okta-gray-mid uppercase tracking-wide">
                         Okta Response (HTTP {event.oktaStatus})
                       </span>
-                      <pre className="mt-2 p-3 bg-blue-900 text-blue-200 rounded-md text-xs overflow-x-auto">
+                      <pre className="mt-2 p-3 bg-okta-blue-dark text-blue-200 rounded-md text-xs overflow-x-auto">
                         {event.oktaResponse || '(empty response)'}
                       </pre>
                     </div>
@@ -153,7 +154,7 @@ export default function EventHistory({ events, onClear }: EventHistoryProps) {
                   {event.token && (
                     <div className="mt-3">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                        <span className="text-xs font-semibold text-okta-gray-mid uppercase tracking-wide">
                           Signed JWT
                         </span>
                         <button
@@ -162,7 +163,7 @@ export default function EventHistory({ events, onClear }: EventHistoryProps) {
                             e.stopPropagation();
                             navigator.clipboard.writeText(event.token!);
                           }}
-                          className="text-xs text-blue-600 hover:text-blue-800"
+                          className="text-xs text-okta-blue hover:text-okta-blue-hover font-medium"
                         >
                           Copy
                         </button>
