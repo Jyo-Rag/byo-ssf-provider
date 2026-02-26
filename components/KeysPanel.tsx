@@ -4,7 +4,11 @@ import { useState, useEffect } from 'react';
 import type { GenerateKeysResponse } from '@/lib/types';
 import InfoDrawer from '@/components/InfoDrawer';
 
-export default function KeysPanel() {
+interface KeysPanelProps {
+  onKeysReady?: (ready: boolean) => void;
+}
+
+export default function KeysPanel({ onKeysReady }: KeysPanelProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [hasKeys, setHasKeys] = useState(false);
   const [keyId, setKeyId] = useState<string | null>(null);
@@ -12,16 +16,42 @@ export default function KeysPanel() {
   const [justGenerated, setJustGenerated] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const [manualSetupVars, setManualSetupVars] = useState<GenerateKeysResponse['envVars'] | null>(null);
+  const [isChecking, setIsChecking] = useState(false);
+  const [checkFailed, setCheckFailed] = useState(false);
+
+  const applyKeyData = (data: GenerateKeysResponse) => {
+    const ready = data.hasKeys ?? false;
+    setHasKeys(ready);
+    setKeyId(data.keyId ?? null);
+    onKeysReady?.(ready);
+  };
 
   useEffect(() => {
     fetch('/api/generate-keys')
       .then((r) => r.json())
-      .then((data: GenerateKeysResponse) => {
-        setHasKeys(data.hasKeys ?? false);
-        setKeyId(data.keyId ?? null);
-      })
+      .then((data: GenerateKeysResponse) => applyKeyData(data))
       .catch(() => {/* server not ready yet */});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handleCheckKeys = async () => {
+    setIsChecking(true);
+    setCheckFailed(false);
+    try {
+      const response = await fetch('/api/generate-keys');
+      const data: GenerateKeysResponse = await response.json();
+      if (data.hasKeys) {
+        applyKeyData(data);
+        setManualSetupVars(null);
+      } else {
+        setCheckFailed(true);
+      }
+    } catch {
+      setCheckFailed(true);
+    } finally {
+      setIsChecking(false);
+    }
+  };
 
   const handleGenerate = async () => {
     setIsGenerating(true);
@@ -80,11 +110,11 @@ export default function KeysPanel() {
             <div className="space-y-3">
               <div className="p-3 bg-amber-50 border border-amber-200 rounded-md">
                 <p className="text-xs font-semibold text-amber-800 mb-1">Manual setup required</p>
-                <p className="text-xs text-amber-700">
-                  The filesystem is read-only (e.g. Vercel). Copy these values into your hosting
-                  provider&apos;s environment variables, then redeploy. After redeploying, reload
-                  this page and proceed to Step 3.
-                </p>
+                <ol className="text-xs text-amber-700 list-decimal pl-4 space-y-0.5 mt-1">
+                  <li>Copy each value below into your hosting provider&apos;s environment variables.</li>
+                  <li>Redeploy the app.</li>
+                  <li>Click <span className="font-semibold">Check — I&apos;ve redeployed</span> to confirm the keys are active before continuing.</li>
+                </ol>
               </div>
               {Object.entries(manualSetupVars).map(([key, value]) => (
                 <div key={key} className="p-3 bg-okta-bg rounded-md border border-okta-border space-y-1">
@@ -101,6 +131,30 @@ export default function KeysPanel() {
                   <p className="text-xs font-mono text-okta-gray-mid break-all">{value}</p>
                 </div>
               ))}
+              {checkFailed && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+                  <p className="text-xs text-red-700">
+                    Keys not detected yet — make sure you&apos;ve added all three env vars and the redeploy has finished.
+                  </p>
+                </div>
+              )}
+              <button
+                onClick={handleCheckKeys}
+                disabled={isChecking}
+                className="w-full py-2.5 px-4 bg-okta-blue text-white font-semibold text-sm rounded-md hover:bg-okta-blue-hover disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+              >
+                {isChecking ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Checking...
+                  </>
+                ) : (
+                  'Check — I\'ve redeployed'
+                )}
+              </button>
             </div>
           ) : hasKeys && keyId ? (
             <div className="space-y-3">

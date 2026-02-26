@@ -15,6 +15,7 @@ export default function Home() {
   const [providerId, setProviderId] = useState('');
   const [eventHistory, setEventHistory] = useState<EventHistoryItem[]>([]);
   const [appUrl, setAppUrl] = useState('');
+  const [hasKeys, setHasKeys] = useState(false);
 
   // Load saved config from localStorage on mount
   useEffect(() => {
@@ -37,7 +38,7 @@ export default function Home() {
     setEventHistory([]);
   };
 
-  const isConfigured = oktaOrgUrl && apiKey && publicAppUrl;
+  const isConfigured = hasKeys && oktaOrgUrl && apiKey && publicAppUrl;
 
   return (
     <>
@@ -80,7 +81,7 @@ export default function Home() {
           <span className="w-7 h-7 rounded-full bg-okta-blue text-white text-xs flex items-center justify-center font-semibold flex-shrink-0 shadow-sm">1</span>
           <span className="text-sm font-semibold text-okta-charcoal tracking-wide uppercase" style={{ letterSpacing: '0.04em' }}>Generate Signing Keys</span>
         </div>
-        <KeysPanel />
+        <KeysPanel onKeysReady={setHasKeys} />
 
         {/* Step 2: Config Panel */}
         <div className="flex items-center gap-3 mb-3">
