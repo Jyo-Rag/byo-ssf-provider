@@ -57,8 +57,8 @@ export async function POST(): Promise<NextResponse<GenerateKeysResponse>> {
           requiresManualSetup: true,
           envVars: {
             SSF_KEY_ID: keyId,
-            SSF_PRIVATE_KEY: `"${privateKeyEnv}"`,
-            SSF_PUBLIC_KEY: `"${publicKeyEnv}"`,
+            SSF_PRIVATE_KEY: privateKeyPem,
+            SSF_PUBLIC_KEY: publicKeyPem,
           },
         });
       }

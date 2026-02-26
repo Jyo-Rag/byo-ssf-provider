@@ -128,7 +128,12 @@ export default function KeysPanel({ onKeysReady }: KeysPanelProps) {
                       Copy
                     </button>
                   </div>
-                  <p className="text-xs font-mono text-okta-gray-mid break-all">{value}</p>
+                  <textarea
+                    readOnly
+                    value={value}
+                    rows={value.includes('\n') ? 4 : 1}
+                    className="w-full text-xs font-mono text-okta-gray-mid bg-transparent resize-none border-0 outline-none p-0"
+                  />
                 </div>
               ))}
               {checkFailed && (
