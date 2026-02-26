@@ -1,6 +1,7 @@
-########## **For demo and poc use only. ##########
+######################################################
+# Disclaimer: For demo and poc use only. 
 > This app is not suitable for production. The Okta API token is persisted in browser `localStorage`, and the RSA private key is stored as a plain-text environment variable in `.env.local`. Neither is an acceptable secret storage mechanism for a production system. Use this app in a controlled lab or demo environment with a non-production Okta tenant only.
-
+######################################################
 # BYO SSF Provider
 
 A web application for sending CAEP (Continuous Access Evaluation Protocol) Risk Change events to Okta via the Shared Signals Framework (SSF). The app walks you through a guided 4-step setup — generating signing keys, configuring your Okta connection, registering a provider, and sending risk events — entirely through the browser UI.
