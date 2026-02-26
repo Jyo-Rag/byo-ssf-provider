@@ -11,6 +11,7 @@ export default function KeysPanel() {
   const [error, setError] = useState<string | null>(null);
   const [justGenerated, setJustGenerated] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+  const [manualSetupVars, setManualSetupVars] = useState<GenerateKeysResponse['envVars'] | null>(null);
 
   useEffect(() => {
     fetch('/api/generate-keys')
@@ -31,10 +32,14 @@ export default function KeysPanel() {
       const response = await fetch('/api/generate-keys', { method: 'POST' });
       const data: GenerateKeysResponse = await response.json();
 
-      if (data.success && data.keyId) {
+      if (data.success && data.requiresManualSetup && data.envVars) {
+        setManualSetupVars(data.envVars);
+        setKeyId(data.keyId ?? null);
+      } else if (data.success && data.keyId) {
         setHasKeys(true);
         setKeyId(data.keyId);
         setJustGenerated(true);
+        setManualSetupVars(null);
       } else {
         setError(data.error || data.message);
       }
@@ -71,7 +76,33 @@ export default function KeysPanel() {
         </div>
 
         <div className="px-5 py-4 space-y-3">
-          {hasKeys && keyId ? (
+          {manualSetupVars ? (
+            <div className="space-y-3">
+              <div className="p-3 bg-amber-50 border border-amber-200 rounded-md">
+                <p className="text-xs font-semibold text-amber-800 mb-1">Manual setup required</p>
+                <p className="text-xs text-amber-700">
+                  The filesystem is read-only (e.g. Vercel). Copy these values into your hosting
+                  provider&apos;s environment variables, then redeploy. After redeploying, reload
+                  this page and proceed to Step 3.
+                </p>
+              </div>
+              {Object.entries(manualSetupVars).map(([key, value]) => (
+                <div key={key} className="p-3 bg-okta-bg rounded-md border border-okta-border space-y-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-mono font-semibold text-okta-charcoal">{key}</p>
+                    <button
+                      type="button"
+                      onClick={() => navigator.clipboard.writeText(value)}
+                      className="text-xs text-okta-blue hover:text-okta-blue-hover font-medium"
+                    >
+                      Copy
+                    </button>
+                  </div>
+                  <p className="text-xs font-mono text-okta-gray-mid break-all">{value}</p>
+                </div>
+              ))}
+            </div>
+          ) : hasKeys && keyId ? (
             <div className="space-y-3">
               <div className="p-3 bg-okta-bg rounded-md text-xs space-y-1 border border-okta-border">
                 <p className="text-okta-gray-mid font-medium">Current Key ID</p>

@@ -43,7 +43,27 @@ export async function POST(): Promise<NextResponse<GenerateKeysResponse>> {
     envContent = updateEnvVar(envContent, 'SSF_PRIVATE_KEY', `"${privateKeyEnv}"`);
     envContent = updateEnvVar(envContent, 'SSF_PUBLIC_KEY', `"${publicKeyEnv}"`);
 
-    writeFileSync(envPath, envContent, 'utf-8');
+    try {
+      writeFileSync(envPath, envContent, 'utf-8');
+    } catch (writeError) {
+      const code = (writeError as NodeJS.ErrnoException).code;
+      if (code === 'EROFS' || code === 'ENOENT' || code === 'EROFS') {
+        // Read-only filesystem (e.g. Vercel) — return the values for manual setup
+        return NextResponse.json({
+          success: true,
+          message: 'Keys generated. The filesystem is read-only so the keys could not be saved automatically. Copy the values below into your hosting provider\'s environment variables and redeploy.',
+          keyId,
+          hasKeys: false,
+          requiresManualSetup: true,
+          envVars: {
+            SSF_KEY_ID: keyId,
+            SSF_PRIVATE_KEY: `"${privateKeyEnv}"`,
+            SSF_PUBLIC_KEY: `"${publicKeyEnv}"`,
+          },
+        });
+      }
+      throw writeError;
+    }
 
     return NextResponse.json({
       success: true,

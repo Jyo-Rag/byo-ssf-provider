@@ -107,6 +107,12 @@ export interface GenerateKeysResponse {
   keyId?: string | null;
   hasKeys?: boolean;
   error?: string;
+  requiresManualSetup?: boolean;
+  envVars?: {
+    SSF_KEY_ID: string;
+    SSF_PRIVATE_KEY: string;
+    SSF_PUBLIC_KEY: string;
+  };
 }
 
 // Okta Security Events Provider (SSF Receiver API)
